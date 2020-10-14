@@ -10,7 +10,12 @@ let particlesArray;
 let mouse = {
     x: null,
     y: null,
-    radius: (particlesContainer.width / 100) * (particlesContainer.height / 100)
+    radius: calculateMouseRadius()
+}
+
+//Calculate mouse radius relative to container size
+function calculateMouseRadius() {
+    return (particlesContainer.width / 100) * (particlesContainer.height / 100);
 }
 
 //Update mouse position on movement
@@ -22,13 +27,21 @@ window.addEventListener("mousemove", (e) => {
 window.addEventListener("resize", () => {
     particlesContainer.width = window.innerWidth;
     particlesContainer.height = window.innerHeight;
-    mouse.radius = (particlesContainer.width / 100) * (particlesContainer.height / 100);
+    mouse.radius = calculateMouseRadius();
 });
 //Prevent mouse interaction when outside canvas
 window.addEventListener("mouseout", () => {
     mouse.x = null;
     mouse.y = null;
 });
+//Expand mouse radius when mouse button held down
+window.addEventListener("mousedown", () => {
+    mouse.radius *= 1.25;
+});
+//Shrink mouse radius to original size when mouse button released
+window.addEventListener("mouseup", () => {
+    mouse.radius = calculateMouseRadius();
+})
 
 //Create particle
 class Particle {
@@ -49,7 +62,6 @@ class Particle {
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         //Set opacity of particle
-            //TODO: try figure out a way to set globalAlpha only on initial time
         context.globalAlpha = this.opacity;
         //Fill circle in specified colour
         context.fillStyle = this.colour;
@@ -64,30 +76,29 @@ class Particle {
         if(this.y < 0 || this.y > particlesContainer.height) {
             this.y = getRandomCoordinateInBoundary(particlesContainer.height, this.radius);
         }
-        //Circle collision detection with mouse radius
+        //Perform collision check when mouse within boundaries
         if(mouse.x !== null && mouse.y !== null) {
-            let dx = mouse.x - this.x;
-            let dy = mouse.y - this.y;
+            //Calculate distance between particle and cursor
+            let dx = this.x - mouse.x;
+            let dy = this.y - mouse.y;
             let distance = Math.sqrt((dx * dx) + (dy * dy));
-            if(distance < mouse.radius + this.radius) {
-                //Collision detected 
-                //TODO: Figure out how to smoothen collision
-                    //-> Increasing the factor means greater repulsion force, but greater glitching at edge
-                if(mouse.x < this.x) {
-                    //Particle collides right of mouse radius
-                    this.x += 4;
-                } else {
-                    //Particle collides left/equal of mouse radius
-                    this.x -= 4;
-                }
-                if(mouse.y < this.y) {
-                    //Particle collides underneath of mouse radius
-                    this.y += 4;
-                } else {
-                    //Particle collides above/equal of mouse radius
-                    this.y -= 4;
-                }
+            //Calculate normal from particle to mouse
+            let normalVector = {
+                x: dx / distance,
+                y: dy / distance
+            };
+            //Set base repulsion factor to 0 (no collision)
+            let repulsionFactor = 0;
+            //If particle colliding with mouse
+            if(distance < mouse.radius) {
+                //Amplifies repulsion for stronger field
+                let velocity = 100;
+                //Calculate repulsion factor as ratio between distance and mouse radius
+                repulsionFactor = (1 - (distance/mouse.radius)) * velocity;
             }
+            //Move particle along normal by repulsion factor
+            this.x += normalVector.x * repulsionFactor;
+            this.y += normalVector.y * repulsionFactor;
         }
         //Move particle by velocity
         this.x += this.dirX;
@@ -102,10 +113,10 @@ function createParticles() {
     //Initialise to empty array if not already empty
     particlesArray = [];
     //Create population of particles
-    let numParticles = (particlesContainer.width * particlesContainer.height) / 2500;
+    let numParticles = (particlesContainer.width * particlesContainer.height) / 3000;
     for(let i = 0; i < numParticles; i++) {
-        //Randomly set radius between 0.5 and 2
-        let radius = (Math.random() * 2) + 0.5;
+        //Randomly set radius between 0.5 and 2.5
+        let radius = (Math.random() * 2.5) + 0.5;
         //Set particle position within container
         let x = getRandomCoordinateInBoundary(particlesContainer.width, radius);
         let y = getRandomCoordinateInBoundary(particlesContainer.height, radius);
@@ -137,7 +148,7 @@ function connectParticles() {
             let dy = particlesArray[a].y - particlesArray[b].y;
             let distance = Math.sqrt((dx * dx) + (dy * dy));
             //If particles within close proximity
-            if(distance < 70) {
+            if(distance < 60) {
                 //Set line colour
                 context.strokeStyle = '#ECF0F3';
                 //Set line opacity based on distance
