@@ -24,6 +24,11 @@ window.addEventListener("resize", () => {
     particlesContainer.height = window.innerHeight;
     mouse.radius = (particlesContainer.width / 100) * (particlesContainer.height / 100);
 });
+//Prevent mouse interaction when outside canvas
+window.addEventListener("mouseout", () => {
+    mouse.x = null;
+    mouse.y = null;
+});
 
 //Create particle
 class Particle {
@@ -65,7 +70,7 @@ class Particle {
         let distance = Math.sqrt((dx * dx) + (dy * dy));
         if(distance < mouse.radius + this.radius) {
             //Collision detected 
-            //TODO: Figure out how smoother collision
+            //TODO: Figure out how to smoothen collision
             if(mouse.x < this.x) {
                 //Particle collides right of mouse radius
                 this.x += 4;
@@ -133,8 +138,7 @@ function connectParticles() {
                 //Set line colour
                 context.strokeStyle = '#ECF0F3';
                 //Set line opacity based on distance
-                let opacity = 1 - (distance / 100);
-                context.globalAlpha = opacity;
+                context.globalAlpha = 1 - (distance / 150);;
                 //Set line width based on distance
                 context.lineWidth = 1 / (distance / 10);
                 //Draw line from particle A to particle B
