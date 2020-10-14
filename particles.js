@@ -9,13 +9,14 @@ let particlesArray;
 //Create particle
 class Particle {
     //Construct particle with specified values
-    constructor(x, y, dirX, dirY, radius, colour) {
+    constructor(x, y, dirX, dirY, radius, opacity, colour) {
         //Initialise variables to parameters
         this.x = x;
         this.y = y;
         this.dirX = dirX;
         this.dirY = dirY;
         this.radius = radius;
+        this.opacity = opacity;
         this.colour = colour;
     }
     //Draw circular particle
@@ -23,6 +24,9 @@ class Particle {
         //Create arc of x, y, radius, startAngle, endAngle (radians) to create circle
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        //Set opacity of particle
+            //TODO: try figure out a way to set globalAlpha only on initial time
+        context.globalAlpha = this.opacity;
         //Fill circle in specified colour
         context.fillStyle = this.colour;
         context.fill();
@@ -51,18 +55,20 @@ function createParticles() {
     //Create population of particles
     let numParticles = (particlesContainer.width * particlesContainer.height) / 5000;
     for(let i = 0; i < numParticles; i++) {
-        //Randomly set radius between 1 and 5
-        let radius = (Math.random() * 5) + 1;
+        //Randomly set radius between 0.5 and 2
+        let radius = (Math.random() * 2) + 0.5;
         //Set particle position within container
         let x = getRandomCoordinateInBoundary(particlesContainer.width, radius);
-        let y = getRandomCoordinateInBoundary(particlesContainer.height,radius);
+        let y = getRandomCoordinateInBoundary(particlesContainer.height, radius);
         //Set particle speed between 0.05 and 1.5 with random direction
         let dirX = ((Math.random() * 1.5) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
         let dirY = ((Math.random() * 1.5) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
+        //Set particle opacity between 0.1 and 1
+        let opacity = (Math.random() * (1 - 0.1)) + 0.1;
         //Set particle colour
         let colour = '#E3E6EC';
         //Create new particle and push to array
-        particlesArray.push(new Particle(x, y, dirX, dirY, radius, colour));
+        particlesArray.push(new Particle(x, y, dirX, dirY, radius, opacity, colour));
     }
 }
 
