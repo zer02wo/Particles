@@ -3,8 +3,25 @@ const particlesContainer = document.getElementById("particle-container");
 const context = particlesContainer.getContext("2d");
 particlesContainer.width = window.innerWidth;
 particlesContainer.height = window.innerHeight;
+//Resize particles container on window resize
+window.addEventListener("resize", () => {
+    particlesContainer.width = window.innerWidth;
+    particlesContainer.height = window.innerHeight;
+});
+
 //Global array of particles
 let particlesArray;
+//Global mouse object
+let mouse = {
+    x: null,
+    y: null,
+    radius: (particlesContainer.width / 100) * (particlesContainer.height / 100)
+}
+//Update mouse position on movement
+window.addEventListener("mousemove", (e) => {
+    mouse.x = e.x;
+    mouse.y = e.y;
+});
 
 //Create particle
 class Particle {
@@ -39,6 +56,28 @@ class Particle {
         }
         if(this.y < 0 || this.y > particlesContainer.height) {
             this.y = getRandomCoordinateInBoundary(particlesContainer.height, this.radius);
+        }
+        //Circle collision detection with mouse radius
+        let dx = mouse.x - this.x;
+        let dy = mouse.y - this.y;
+        let distance = Math.sqrt((dx * dx) + (dy * dy));
+        if(distance < mouse.radius + this.radius) {
+            //Collision detected 
+            //TODO: Figure out how smoother collision
+            if(mouse.x < this.x) {
+                //Particle collides right of mouse radius
+                this.x += (this.radius);
+            } else {
+                //Particle collides left/equal of mouse radius
+                this.x -= (this.radius);
+            }
+            if(mouse.y < this.y) {
+                //Particle collides underneath of mouse radius
+                this.y += (this.radius);
+            } else {
+                //Particle collides above/equal of mouse radius
+                this.y -= (this.radius);
+            }
         }
         //Move particle by velocity
         this.x += this.dirX;
@@ -94,9 +133,3 @@ function animateParticles() {
 //Initialise particles
 createParticles();
 animateParticles();
-
-//Resize particles container on window resize
-window.addEventListener("resize", () => {
-    particlesContainer.width = window.innerWidth;
-    particlesContainer.height = window.innerHeight;
-});
