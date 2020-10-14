@@ -7,6 +7,21 @@
     left: 0;
     width: 100%;
     height: 100%;
-    /*TODO: add moving gradient*/
-    background: linear-gradient(45deg,#2C3E50, #FD746C)
+    /*Colour morphing gradient*/
+    background: linear-gradient(-45deg, #BD93BD, #A7BFE8, #3494E6, #3F5EFB, #2C3E50, #CD2B3E, #FD746C, #C33764, #1D2671);
+    background-size: 900% 900%;
+    animation: gradient-morph 40s ease infinite;
+}
+
+/*Transition from start to end and back to start*/
+@keyframes gradient-morph {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
 }
