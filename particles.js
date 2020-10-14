@@ -65,25 +65,28 @@ class Particle {
             this.y = getRandomCoordinateInBoundary(particlesContainer.height, this.radius);
         }
         //Circle collision detection with mouse radius
-        let dx = mouse.x - this.x;
-        let dy = mouse.y - this.y;
-        let distance = Math.sqrt((dx * dx) + (dy * dy));
-        if(distance < mouse.radius + this.radius) {
-            //Collision detected 
-            //TODO: Figure out how to smoothen collision
-            if(mouse.x < this.x) {
-                //Particle collides right of mouse radius
-                this.x += 4;
-            } else {
-                //Particle collides left/equal of mouse radius
-                this.x -= 4;
-            }
-            if(mouse.y < this.y) {
-                //Particle collides underneath of mouse radius
-                this.y += 4;
-            } else {
-                //Particle collides above/equal of mouse radius
-                this.y -= 4;
+        if(mouse.x !== null && mouse.y !== null) {
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt((dx * dx) + (dy * dy));
+            if(distance < mouse.radius + this.radius) {
+                //Collision detected 
+                //TODO: Figure out how to smoothen collision
+                    //-> Increasing the factor means greater repulsion force, but greater glitching at edge
+                if(mouse.x < this.x) {
+                    //Particle collides right of mouse radius
+                    this.x += 4;
+                } else {
+                    //Particle collides left/equal of mouse radius
+                    this.x -= 4;
+                }
+                if(mouse.y < this.y) {
+                    //Particle collides underneath of mouse radius
+                    this.y += 4;
+                } else {
+                    //Particle collides above/equal of mouse radius
+                    this.y -= 4;
+                }
             }
         }
         //Move particle by velocity
@@ -138,9 +141,9 @@ function connectParticles() {
                 //Set line colour
                 context.strokeStyle = '#ECF0F3';
                 //Set line opacity based on distance
-                context.globalAlpha = 1 - (distance / 150);;
+                context.globalAlpha = 0.7 - (distance / 100);;
                 //Set line width based on distance
-                context.lineWidth = 1 / (distance / 10);
+                context.lineWidth = 1 + (distance / 75);
                 //Draw line from particle A to particle B
                 context.beginPath();
                 context.moveTo(particlesArray[a].x, particlesArray[a].y);
