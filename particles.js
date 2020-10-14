@@ -49,9 +49,9 @@ function createParticles() {
         //Set particle position within container, accounting for particle diameter as buffer
         let x = (Math.random() * ((particlesContainer.width - radius * 2) - (radius * 2)) + radius * 2);
         let y = (Math.random() * ((particlesContainer.height - radius * 2) - (radius * 2)) + radius * 2);
-        //Set particle velocity between -2.5 and 2.5
-        let dirX = (Math.random() * 5) - 2.5;
-        let dirY = (Math.random() * 5) - 2.5;
+        //Set particle speed between 0.05 and 3 with random direction
+        let dirX = ((Math.random() * 3) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
+        let dirY = ((Math.random() * 3) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
         //Set particle colour
         let colour = '#E3E6EC';
         //Create new particle and push to array
