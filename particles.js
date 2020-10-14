@@ -128,16 +128,16 @@ function connectParticles() {
             let dx = particlesArray[a].x - particlesArray[b].x;
             let dy = particlesArray[a].y - particlesArray[b].y;
             let distance = Math.sqrt((dx * dx) + (dy * dy));
-            //TODO: If distance is less than arbitrary calculation I need to figure out
+            //If particles within close proximity
             if(distance < 70) {
-                //TODO: set opacity based on distance
-                let opacity = 1 - (distance / 100);
-                context.globalAlpha = opacity;
                 //Set line colour
                 context.strokeStyle = '#ECF0F3';
-                //TODO: set this to expand based on distance
+                //Set line opacity based on distance
+                let opacity = 1 - (distance / 100);
+                context.globalAlpha = opacity;
+                //Set line width based on distance
                 context.lineWidth = 1 / (distance / 10);
-                //TODO: Draw line from particle A to particle B
+                //Draw line from particle A to particle B
                 context.beginPath();
                 context.moveTo(particlesArray[a].x, particlesArray[a].y);
                 context.lineTo(particlesArray[b].x, particlesArray[b].y);
