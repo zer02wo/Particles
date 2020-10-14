@@ -3,11 +3,6 @@ const particlesContainer = document.getElementById("particle-container");
 const context = particlesContainer.getContext("2d");
 particlesContainer.width = window.innerWidth;
 particlesContainer.height = window.innerHeight;
-//Resize particles container on window resize
-window.addEventListener("resize", () => {
-    particlesContainer.width = window.innerWidth;
-    particlesContainer.height = window.innerHeight;
-});
 
 //Global array of particles
 let particlesArray;
@@ -17,10 +12,17 @@ let mouse = {
     y: null,
     radius: (particlesContainer.width / 100) * (particlesContainer.height / 100)
 }
+
 //Update mouse position on movement
 window.addEventListener("mousemove", (e) => {
     mouse.x = e.x;
     mouse.y = e.y;
+});
+//Resize particles container on window resize
+window.addEventListener("resize", () => {
+    particlesContainer.width = window.innerWidth;
+    particlesContainer.height = window.innerHeight;
+    mouse.radius = (particlesContainer.width / 100) * (particlesContainer.height / 100);
 });
 
 //Create particle
@@ -66,17 +68,17 @@ class Particle {
             //TODO: Figure out how smoother collision
             if(mouse.x < this.x) {
                 //Particle collides right of mouse radius
-                this.x += (this.radius);
+                this.x += 4;
             } else {
                 //Particle collides left/equal of mouse radius
-                this.x -= (this.radius);
+                this.x -= 4;
             }
             if(mouse.y < this.y) {
                 //Particle collides underneath of mouse radius
-                this.y += (this.radius);
+                this.y += 4;
             } else {
                 //Particle collides above/equal of mouse radius
-                this.y -= (this.radius);
+                this.y -= 4;
             }
         }
         //Move particle by velocity
@@ -92,7 +94,7 @@ function createParticles() {
     //Initialise to empty array if not already empty
     particlesArray = [];
     //Create population of particles
-    let numParticles = (particlesContainer.width * particlesContainer.height) / 5000;
+    let numParticles = (particlesContainer.width * particlesContainer.height) / 2500;
     for(let i = 0; i < numParticles; i++) {
         //Randomly set radius between 0.5 and 2
         let radius = (Math.random() * 2) + 0.5;
@@ -117,6 +119,34 @@ function getRandomCoordinateInBoundary(length, radius) {
     return (Math.random() * ((length - radius * 2) - (radius * 2)) + radius * 2);
 }
 
+function connectParticles() {
+    //For each particle
+    for(let a = 0; a < particlesArray.length; a++) {
+        //For each particle after a
+        for(let b = a; b < particlesArray.length; b++) {
+            //Calculate distance between two particles
+            let dx = particlesArray[a].x - particlesArray[b].x;
+            let dy = particlesArray[a].y - particlesArray[b].y;
+            let distance = Math.sqrt((dx * dx) + (dy * dy));
+            //TODO: If distance is less than arbitrary calculation I need to figure out
+            if(distance < 70) {
+                //TODO: set opacity based on distance
+                let opacity = 1 - (distance / 100);
+                context.globalAlpha = opacity;
+                //Set line colour
+                context.strokeStyle = '#ECF0F3';
+                //TODO: set this to expand based on distance
+                context.lineWidth = 1 / (distance / 10);
+                //TODO: Draw line from particle A to particle B
+                context.beginPath();
+                context.moveTo(particlesArray[a].x, particlesArray[a].y);
+                context.lineTo(particlesArray[b].x, particlesArray[b].y);
+                context.stroke();
+            }
+        }
+    }
+}
+
 //Animation loop to update frames
 function animateParticles() {
     //Update every animation frame
@@ -128,6 +158,8 @@ function animateParticles() {
         //Update particle
         particle.update();
     }
+    //Connect particles by distance
+    connectParticles();
 }
 
 //Initialise particles
