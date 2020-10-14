@@ -29,6 +29,13 @@ class Particle {
     }
     //Update particle each animation frame
     update() {
+        //Respawn particle at new position if outside boundary
+        if(this.x < 0 || this.x > particlesContainer.width) {
+            this.x = getRandomCoordinateInBoundary(particlesContainer.width, this.radius);
+        }
+        if(this.y < 0 || this.y > particlesContainer.height) {
+            this.y = getRandomCoordinateInBoundary(particlesContainer.height, this.radius);
+        }
         //Move particle by velocity
         this.x += this.dirX;
         this.y += this.dirY;
@@ -46,17 +53,23 @@ function createParticles() {
     for(let i = 0; i < numParticles; i++) {
         //Randomly set radius between 1 and 5
         let radius = (Math.random() * 5) + 1;
-        //Set particle position within container, accounting for particle diameter as buffer
-        let x = (Math.random() * ((particlesContainer.width - radius * 2) - (radius * 2)) + radius * 2);
-        let y = (Math.random() * ((particlesContainer.height - radius * 2) - (radius * 2)) + radius * 2);
-        //Set particle speed between 0.05 and 3 with random direction
-        let dirX = ((Math.random() * 3) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
-        let dirY = ((Math.random() * 3) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
+        //Set particle position within container
+        let x = getRandomCoordinateInBoundary(particlesContainer.width, radius);
+        let y = getRandomCoordinateInBoundary(particlesContainer.height,radius);
+        //Set particle speed between 0.05 and 1.5 with random direction
+        let dirX = ((Math.random() * 1.5) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
+        let dirY = ((Math.random() * 1.5) + 0.05) * (Math.random() < 0.5 ? -1 : 1);
         //Set particle colour
         let colour = '#E3E6EC';
         //Create new particle and push to array
         particlesArray.push(new Particle(x, y, dirX, dirY, radius, colour));
     }
+}
+
+//Return x/y coordinate value within container boundary
+function getRandomCoordinateInBoundary(length, radius) {
+    //Return position within boundary, accounting for particle diameter as buffer
+    return (Math.random() * ((length - radius * 2) - (radius * 2)) + radius * 2);
 }
 
 //Animation loop to update frames
@@ -65,7 +78,7 @@ function animateParticles() {
     requestAnimationFrame(animateParticles);
     //Clear drawn particles within container boundaries
     context.clearRect(0, 0, particlesContainer.width, particlesContainer.height);
-    //For each particle
+    //For each particle in array
     for(let particle of particlesArray) {
         //Update particle
         particle.update();
@@ -75,3 +88,9 @@ function animateParticles() {
 //Initialise particles
 createParticles();
 animateParticles();
+
+//Resize particles container on window resize
+window.addEventListener("resize", () => {
+    particlesContainer.width = window.innerWidth;
+    particlesContainer.height = window.innerHeight;
+});
