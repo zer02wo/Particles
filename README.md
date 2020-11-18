@@ -1,3 +1,5 @@
+<img src="images/Particles.png" alt="Particles logo" height="240">
+
 # Particles
 
 <img src="images/Animation.gif" alt="Particles animation" height="400">
